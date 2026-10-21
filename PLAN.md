@@ -1,180 +1,179 @@
-# Leiterbonus – Plan: Signal-App für XAU/USD (Gold)
+# Leiterbonus – Plan: Gold-Scalping-Assistent (XAU/USD) fürs Handy
 
-> Status: **Entwurf – Planphase.** Noch kein Code. Offene Punkte stehen unten in Abschnitt 11.
+> Status: **Finaler Plan – wartet auf Freigabe.** Erst nach Freigabe wird programmiert.
 
 ## 1. Ziel
 
-Eine lokale, kostenlose Signal-App für **Scalping im Gold-Kurs (XAU/USD)**, die anzeigt:
+Ein persönlicher, kostenloser Trading-Assistent für **Scalping in Gold (XAU/USD)**, nutzbar **nur auf dem Handy**, der zeigt:
 
-- **wann** und **zu welchem Kurs** ein Einstieg sinnvoll ist (Long/Short),
+- **wann** (Uhrzeit) und **zu welchem Kurs** ein Einstieg sinnvoll ist – als konkrete Setups mit Auslöse-Bedingung,
 - **wo** Stop-Loss und Take-Profit liegen,
-- **wie groß** die Position sein darf (Risikomanagement),
-- **wie wahrscheinlich** ein Gewinn-Trade ist – basierend auf Backtests, nicht geschätzt,
-- **wie die Nachrichtenlage** heute ist (täglicher Briefing durch Claude).
+- **wie viel Lot** erlaubt ist (Risikomanagement),
+- **wie oft** so ein Setup früher funktioniert hat (Backtest-Trefferquote),
+- **wie die Nachrichtenlage** heute ist (Tagesbriefing von Claude).
 
-Die App führt **keine Trades aus**. Trades werden manuell in MetaTrader 5 platziert.
+Die App führt **keine Trades aus** – du handelst selbst in der MetaTrader-5-App.
 
 ## 2. Rahmenbedingungen
 
 | Punkt | Entscheidung |
 |---|---|
 | Markt | nur XAU/USD |
-| Plattform | MetaTrader 5 (Kursquelle + manuelle Ausführung) |
+| Gerät | nur Handy (kein PC) |
+| Broker-Plattform | MetaTrader 5 App (Chart + manuelle Ausführung) |
 | Stil | Scalping, Haltedauer Sekunden bis Minuten |
-| Handelszeit | flexibel (z. B. ab 15:00 Uhr, US-Eröffnung 15:30) |
+| Handelszeit | Standard: New-York-Eröffnung (Vorbereitung ab 15:00, Handel ab 15:30); andere Zeiten möglich |
 | Kapital | ca. 200 € |
-| Risiko pro Trade | 0,5 – 2 % (Standard: 1 %) |
-| Kosten | **0 €** – keine bezahlten APIs, keine Claude-API, kein Server |
-| Betrieb | nur lokal auf dem eigenen PC |
+| Risiko pro Trade | 1 % Standard (einstellbar 0,5 – 2 %) |
+| Kosten | **0 €** – keine bezahlten APIs, keine Claude-API, kein Server, keine Abos |
+| Sichtbarkeit | privat, nur für dich |
 | Benachrichtigungen | keine |
-| Start | **Demo-Phase** auf einem MT5-Demokonto, bevor echtes Geld eingesetzt wird |
+| Start | **Demo-Phase** mit MT5-Demokonto, bevor echtes Geld eingesetzt wird |
 
-## 3. Täglicher Ablauf
+## 3. Wie das ohne PC funktioniert
 
-1. **Briefing-Update (vor dem Traden):** In einer Claude-Code-Sitzung sagst du z. B. *„Update fürs Trading heute“*.
-   Claude recherchiert Nachrichten und Wirtschaftskalender, schreibt das Tagesbriefing
-   (`briefings/JJJJ-MM-TT.json`) ins Repo, ggf. mit Strategie-Anpassungen, und pusht.
-2. **Lokal aktualisieren:** `git pull` (oder Doppelklick auf ein Update-Skript).
-3. **App starten:** MT5 läuft, dann `start.bat` → Dashboard im Browser (`http://localhost:8501`).
-4. **Traden:** App zeigt Signale live; du entscheidest und handelst manuell in MT5.
-5. **Tagebuch:** Ausgeführte Trades werden aus MT5 automatisch eingelesen (Historie) und ausgewertet.
-6. **Lernen:** Beim nächsten Briefing wertet Claude die gesammelte Statistik aus
-   (welche Signale, Uhrzeiten, Nachrichtenlagen funktioniert haben) und passt Parameter an.
-
-Kosten: keine – das Briefing läuft über deine bestehende Claude-Code-Nutzung, nicht über eine API.
-
-## 4. Architektur
+Die schwere Arbeit (Nachrichten lesen, Kursdaten laden, Backtests rechnen) passiert **in deiner Claude-Code-Sitzung** in der Cloud.
+Das Ergebnis ist eine **private Seite (Claude-Artifact)**, die du auf dem Handy im Browser bzw. in der Claude-App öffnest.
 
 ```
- MetaTrader 5 (lokal, Demo/Echt)
-        │  Python-Paket "MetaTrader5" (kostenlos, liest Live-Ticks + Historie)
-        ▼
- ┌──────────────────────────── Leiterbonus (Python, lokal) ───────────────────────────┐
- │  Datensammler ──► SQLite-Datenbank ◄── Briefing-Import (briefings/*.json von Claude) │
- │                        │                                                            │
- │        Indikatoren + Strategie-Regeln ──► Signal-Engine ──► Risiko-Rechner          │
- │                        │                                                            │
- │                 Backtester (Wahrscheinlichkeiten, Kennzahlen)                       │
- │                        ▼                                                            │
- │                 Dashboard (Streamlit, im Browser)                                   │
- └─────────────────────────────────────────────────────────────────────────────────────┘
+  Du (Handy)                       Claude (Claude-Code-Sitzung, Cloud)
+  ──────────                       ───────────────────────────────────
+  "Update fürs Trading heute"  ──►  1. Nachrichten + Wirtschaftskalender recherchieren
+                                    2. Kostenlose Gold-Kursdaten laden (Historie, M1)
+                                    3. Backtests der Strategien rechnen (inkl. Spread)
+                                    4. Dein Tagebuch auswerten (was hat funktioniert?)
+                                    5. Tagesplan erstellen und Seite aktualisieren
+  Seite öffnen  ◄──────────────────  private Leiterbonus-Seite (gleicher Link jeden Tag)
+  MT5-App: Chart beobachten,
+  Setup tritt ein → Trade manuell
+  Trade im Tagebuch eintragen  ──►  wird gespeichert, Claude liest es beim nächsten Update
 ```
 
-**Technik:** Python 3.12, `MetaTrader5`, `pandas`, `SQLite`, `Streamlit`, `plotly` (Chart). Alles kostenlos.
+**Kosten:** keine – alles läuft über deine bestehende Claude-Nutzung.
 
-## 5. Komponenten
+**Ehrliche Einschränkung:** Die Seite sieht den Live-Kurs nicht automatisch (das wäre nur mit kostenpflichtigen Datenfeeds oder einem PC mit MT5 zuverlässig).
+Darum liefert sie **Setups mit klaren Bedingungen** („Wenn eine 1-Minuten-Kerze über 2.xxx schließt → Long“), die du im MT5-Chart erkennst.
+In Meilenstein 1 testen wir, ob ein kostenloser Live-Kurs in der Seite funktioniert – falls ja, kommt er als Extra dazu.
 
-### 5.1 Kursdaten (aus MT5)
-- Live-Ticks (Bid/Ask, Spread) und Kerzen M1/M5/M15 für XAUUSD.
-- Historische Daten (Monate bis Jahre M1) für Backtests – direkt aus dem MT5-Terminal.
-- Symbolinfos vom Broker: Mindest-Lot, Kontraktgröße, Spread, Margin – wichtig für korrekte Positionsgrößen.
+## 4. Die Seite (Aufbau)
 
-### 5.2 Tagesbriefing (von Claude, manuell angestoßen)
-JSON-Datei pro Tag, z. B.:
-- `bias`: bullish / bearish / neutral + Begründung
-- `risk_level`: niedrig / mittel / hoch (z. B. hoch bei Fed-Entscheid, Krieg, Eskalation)
-- `events`: Termine mit Uhrzeit (US-Arbeitsmarkt, CPI, FOMC, Reden …) → **Sperrzeiten**, in denen die App keine Signale gibt (z. B. ±15 min um High-Impact-News)
-- `key_levels`: wichtige Kursmarken (Vortageshoch/-tief, runde Zahlen, Widerstände)
-- `notes`: Nachrichtenzusammenfassung (Fed/Zinsen, US-Dollar, Anleihen-Renditen, Geopolitik, Zentralbankkäufe)
-- `strategy_overrides`: optionale Anpassungen (z. B. „heute nur Long“, „Risiko halbieren“)
+1. **Heute** – Ampel (Handeln / Vorsicht / Nicht handeln), Bias (steigend / fallend / neutral), Risikostufe, Countdown bis zur nächsten wichtigen Nachricht.
+2. **Setups** – 2–4 konkrete Setups für die Session, jeweils mit:
+   - Auslöse-Bedingung und Einstiegskurs
+   - Stop-Loss und Take-Profit (Kurs + Abstand)
+   - empfohlene Lotgröße
+   - Gültigkeit (Uhrzeitfenster)
+   - historische Trefferquote + Anzahl getesteter Fälle
+   - kurze Begründung
+3. **Sperrzeiten** – Zeitfenster um wichtige Nachrichten (z. B. ±15 min um US-Arbeitsmarktdaten, Inflation, Fed), in denen nicht gehandelt wird.
+4. **Wichtige Kursmarken** – Vortageshoch/-tief, Tageseröffnung, runde Zahlen, Asien-/London-Spanne.
+5. **Risiko-Rechner** – Kontostand + Risiko % + Stop-Abstand → Lotgröße; zeigt, wie viel € ein Trade kosten kann.
+6. **Vor-dem-Trade-Checkliste** – Sperrzeit? Spread ok? Tageslimit erreicht? Setup wirklich ausgelöst?
+7. **Tagebuch** – Trade eintragen (Uhrzeit, Setup, Long/Short, Lot, Einstieg, Ausstieg, Ergebnis, Notiz). Tagesbilanz + Tageslimit-Anzeige.
+8. **Statistik** – deine Trefferquote, Gewinn/Verlust, beste/schlechteste Setups und Uhrzeiten, Backtest vs. Realität.
+9. **Nachrichten** – Zusammenfassung der Lage (Fed/Zinsen, US-Dollar, Anleihen-Renditen, Geopolitik, Zentralbank-Goldkäufe) mit Quellen.
 
-### 5.3 Signal-Engine
-- Wertet laufend die Kerzen aus und erzeugt Signale mit: Richtung, Einstiegskurs, Stop-Loss, Take-Profit, Gültigkeitsdauer, Begründung, historische Trefferquote.
-- Filtert nach Briefing (Bias, Sperrzeiten, Risikostufe) und nach Spread (bei zu hohem Spread kein Signal).
+## 5. Datenquellen (alle kostenlos)
 
-### 5.4 Risiko-Rechner
-- Lotgröße = (Kontostand × Risiko %) ÷ (Stop-Abstand × Wert pro Punkt), abgerundet auf Broker-Lot-Schritt.
-- **Warnung**, wenn selbst das Mindest-Lot mehr als das erlaubte Risiko bedeutet → dann **kein Trade**.
-- Tagesverlustlimit (Vorschlag: 3 % → danach zeigt die App „Feierabend“).
-- Maximal X Trades pro Tag, Mindest-Chance-Risiko-Verhältnis (z. B. 1 : 1,5).
+| Was | Quelle |
+|---|---|
+| Historische Gold-Kurse (Minuten/Ticks) für Backtests | kostenlose historische Daten, z. B. Dukascopy (XAU/USD Tick/M1), ergänzend Stooq / Yahoo Finance |
+| Wirtschaftskalender | öffentliche Kalender (z. B. Forex Factory, Investing.com), offizielle Termine (BLS, Fed) |
+| Nachrichten | öffentliche Nachrichtenseiten und Finanz-News (Reuters, Bloomberg-Schlagzeilen, Kitco, FXStreet u. a.) |
+| Live-Kurs & Ausführung | deine MT5-App |
 
-### 5.5 Backtester & Statistik
-- Testet jede Strategie auf historischen M1-Daten **inklusive Spread**.
-- Kennzahlen: Trefferquote, Ø Gewinn/Verlust, Profit-Faktor, max. Drawdown, Ergebnis nach Uhrzeit/Wochentag.
-- Daraus kommt die angezeigte „Wahrscheinlichkeit“ eines Signals.
+Hinweis: Kurse verschiedener Quellen weichen leicht vom Kurs deines Brokers ab (meist wenige Cent bis ca. 1 USD).
+Die Seite gibt deshalb Abstände (z. B. „Stop 2,00 USD unter Einstieg“) immer mit an, damit du sie auf den Broker-Kurs übertragen kannst.
 
-### 5.6 Trading-Tagebuch
-- Liest abgeschlossene Trades aus der MT5-Historie und ordnet sie den Signalen zu.
-- Vergleicht Backtest-Erwartung mit Realität (Demo-Phase).
+## 6. Strategien (Kandidaten – nur was im Backtest besteht, wird genutzt)
 
-### 5.7 Dashboard (Seiten)
-1. **Live:** Chart + aktuelles Signal + Ampel (Handeln / Warten / Sperrzeit) + Spread.
-2. **Briefing:** Nachrichtenlage, Termine, Bias.
-3. **Risiko-Rechner:** Kontostand, Risiko %, Lot-Vorschlag, Tageslimit.
-4. **Statistik/Backtests:** Kennzahlen je Strategie.
-5. **Tagebuch:** eigene Trades und Ergebnisse.
-
-## 6. Strategien (Kandidaten – werden erst per Backtest bestätigt)
-
-Claude recherchiert und implementiert gängige Scalping-Ansätze; nur was im Backtest nach Spread positiv ist, wird aktiviert:
-
-1. **Opening-Range-Breakout:** Ausbruch aus der Spanne der ersten Minuten nach London- oder New-York-Eröffnung.
-2. **EMA-Trend-Pullback:** Trend auf M5/M15 (z. B. EMA 50/200), Einstieg auf M1 beim Rücksetzer an die EMA 20.
+1. **Opening-Range-Breakout:** Spanne der ersten 5–15 Minuten nach New-York-Eröffnung, Einstieg beim Ausbruch.
+2. **EMA-Trend-Pullback:** Trend auf M5/M15 (EMA 50/200), Einstieg auf M1 beim Rücksetzer an die EMA 20.
 3. **VWAP-Rücklauf:** Rückkehr zum VWAP nach Überdehnung, nur in ruhigen Phasen.
 4. **Mean Reversion (Bollinger + RSI) auf M1:** nur bei niedriger Volatilität und neutralem Bias.
-5. **Key-Level-Reaktion:** Abpraller/Ausbrüche an Vortageshoch/-tief und runden Zahlen (z. B. xx00, xx50).
+5. **Key-Level-Reaktion:** Abpraller/Ausbrüche an Vortageshoch/-tief, Asien-/London-Hoch/-Tief und runden Zahlen.
 
-## 7. Datenbank (SQLite)
+Jede Strategie wird auf mindestens 1–2 Jahren Minutendaten getestet, **mit Spread-Kosten**.
+Aktiviert wird sie nur, wenn sie nach Kosten positiv ist (Profit-Faktor > 1,2, genug Fälle).
+Die angezeigte „Wahrscheinlichkeit“ ist die historische Trefferquote – keine Garantie.
 
-| Tabelle | Inhalt |
+## 7. Risikomanagement (Regeln)
+
+**Wichtig zu deinen bisherigen Lotgrößen:** Bei Gold entspricht 0,01 Lot meist 1 Unze → 1 USD Kursbewegung ≈ 1 USD Gewinn/Verlust.
+
+| Lot | Verlust bei 2 USD Stop | Anteil an 200 € |
+|---|---|---|
+| 0,01 | ca. 2 USD | ca. 1 % |
+| 0,03 | ca. 6 USD | ca. 3 % |
+| 0,05 | ca. 10 USD | ca. 5 % |
+
+→ Mit 200 € und 1 % Risiko ist **0,01 Lot** die passende Größe. 0,03–0,05 Lot entspricht 3–5 % Risiko pro Trade
+(und mehr, wenn der Stop weiter weg ist). Vorschlag:
+
+- **Standard 0,01 Lot**, Stop-Loss ca. 1,50 – 3,00 USD, je nach Setup.
+- **Max. 2 % Risiko pro Trade** – die Seite warnt, wenn ein Setup mehr verlangt; dann wird es übersprungen.
+- **Tagesverlustlimit 4 %** (ca. 8 €) → danach zeigt die Seite „Feierabend“.
+- **Max. 5 Trades pro Tag.**
+- **Chance-Risiko mind. 1 : 1,5.**
+- **Kein Handel in Sperrzeiten** und nicht bei auffällig hohem Spread.
+- Größere Lots erst, wenn das Konto wächst (Lot wächst mit dem Kontostand).
+
+## 8. Datenhaltung
+
+| Wo | Was |
 |---|---|
-| `candles` | Symbol, Zeitrahmen, Zeit, OHLC, Volumen, Spread |
-| `briefings` | Datum, Bias, Risikostufe, Notizen, Overrides |
-| `events` | Zeit, Name, Wichtigkeit, Sperrfenster |
-| `signals` | Zeit, Strategie, Richtung, Entry, SL, TP, Wahrscheinlichkeit, Begründung, Ergebnis |
-| `trades` | MT5-Ticket, Zeit, Richtung, Lot, Entry, Exit, Gewinn, zugeordnetes Signal |
-| `backtests` | Strategie, Parameter, Zeitraum, Kennzahlen |
+| Seite selbst (vom täglichen Update) | Tagesplan, Setups, Kursmarken, Nachrichten, Backtest-Kennzahlen |
+| Datenbank der Seite (privat, kostenlos, bleibt bei Updates erhalten) | Tagebuch-Einträge, Einstellungen (Kontostand, Risiko %) |
+| GitHub-Repo `Leiterbonus` | Backtest-Skripte, Strategie-Code, Briefing-Archiv, gelernte Parameter – damit bei jedem Update der Stand vom Vortag da ist |
 
-## 8. Projektstruktur (geplant)
+## 9. Projektstruktur im Repo
 
 ```
 Leiterbonus/
 ├── PLAN.md
 ├── README.md
-├── requirements.txt
-├── start.bat / update.bat
-├── briefings/            # tägliche Briefings von Claude (JSON)
-├── data/                 # SQLite-Datenbank (nicht im Git)
-└── leiterbonus/
-    ├── mt5_client.py     # Verbindung zu MetaTrader 5
-    ├── collector.py      # Kerzen/Ticks speichern
-    ├── db.py
-    ├── indicators.py
-    ├── strategies/       # eine Datei pro Strategie
-    ├── signals.py
-    ├── risk.py
-    ├── backtest.py
-    ├── journal.py
-    └── dashboard/        # Streamlit-Seiten
+├── briefings/            # Tagesbriefings (JSON), Archiv
+├── research/             # Strategie-Notizen + Quellen
+├── backtest/
+│   ├── data_loader.py    # kostenlose historische Kursdaten laden
+│   ├── indicators.py
+│   ├── strategies/       # eine Datei pro Strategie
+│   ├── engine.py         # Backtest inkl. Spread
+│   └── report.py         # Kennzahlen → JSON für die Seite
+├── learn/
+│   └── params.json       # was aus Tagebuch + Backtests gelernt wurde
+└── app/
+    └── index.html        # die Handy-Seite (Artifact)
 ```
 
-## 9. Meilensteine
+## 10. Meilensteine
 
 | # | Inhalt | Ergebnis |
 |---|---|---|
-| M1 | Grundgerüst, MT5-Verbindung, Datenbank, Kursdaten laden | Live-Kurs + Chart im Dashboard |
-| M2 | Risiko-Rechner mit echten Broker-Symbolinfos | korrekter Lot-Vorschlag |
-| M3 | Briefing-Format + erstes Tagesbriefing + Sperrzeiten | Briefing-Seite |
-| M4 | Indikatoren + 2–3 Strategien + Backtester | Kennzahlen je Strategie |
-| M5 | Live-Signal-Engine mit Filtern | Signale im Dashboard |
-| M6 | Tagebuch (MT5-Historie) + Statistik | Auswertung Demo-Trades |
-| M7 | **Demo-Phase** (Vorschlag: mind. 4 Wochen / 100 Trades) | Entscheidung: Echtgeld ja/nein |
+| M1 | Seite-Grundgerüst (Handy-Layout), Risiko-Rechner, Checkliste; Test, ob ein kostenloser Live-Kurs möglich ist | erste nutzbare Seite |
+| M2 | Tagebuch + Statistik mit Datenbank | Trades eintragen und auswerten |
+| M3 | Historische Daten laden + Backtest-Engine + 2–3 Strategien | Trefferquoten je Strategie |
+| M4 | Tagesbriefing: Nachrichten, Kalender, Sperrzeiten, Kursmarken, Setups | erstes vollständiges „Update fürs Trading heute“ |
+| M5 | Lern-Schleife: Tagebuch auswerten, Parameter anpassen | Update berücksichtigt deine Ergebnisse |
+| M6 | **Demo-Phase**: mind. 4 Wochen bzw. 50–100 Trades auf dem Demokonto | Entscheidung: Echtgeld ja/nein |
 
-## 10. Was die App nicht kann
+## 11. Was die App nicht kann
 
-- Keine garantierten Vorhersagen – Wahrscheinlichkeiten sind historische Werte und können sich ändern.
-- Das Briefing ist so aktuell wie das letzte Update; Ereignisse während der Sitzung erkennt die App nur indirekt (Volatilität, Spread).
-- Bei Scalping fressen Spread und Ausführungsverzögerung einen großen Teil des Gewinns – das wird im Backtest berücksichtigt, bleibt aber die größte Hürde.
+- Keine garantierten Vorhersagen – Trefferquoten sind Vergangenheitswerte.
+- Kein automatischer Live-Kurs garantiert (siehe Abschnitt 3); Ereignisse *während* der Session erkennt sie nicht von selbst.
+- Das Briefing ist so aktuell wie das letzte Update (gern direkt vor der Session machen).
+- Beim Scalping sind Spread und Reaktionszeit am Handy die größten Gegner – das fließt in die Backtests ein.
 
-## 11. Offene Punkte (vor dem Coden zu klären)
+## 12. Vor dem Start noch zu erledigen (deine Seite)
 
-1. **Betriebssystem:** Das Python-Paket `MetaTrader5` läuft nur unter **Windows**. Nutzt du Windows?
-2. **Hebel / Kontogröße – wichtig:** Bei MT5-Brokern ist Gold fast immer ein CFD **mit Hebel**.
-   Das kleinste Lot (0,01) entspricht meist 1 Unze Gold, also einem Positionswert von mehreren tausend USD.
-   Ohne Hebel wäre das mit 200 € nicht handelbar; mit EU-üblichem Hebel 1 : 20 bindet bereits 0,01 Lot
-   einen großen Teil des Kontos als Margin. Außerdem: 1 % Risiko = 2 € → Stop-Loss nur ca. 2 USD vom
-   Einstieg entfernt, wovon der Spread schon einen spürbaren Teil ausmacht.
-   → Bitte in MT5 nachsehen: **Broker-Name, Kontotyp, Hebel, Mindest-Lot, typischer Spread bei XAUUSD.**
-3. **Demokonto:** Hast du schon ein MT5-Demokonto (kostenlos beim Broker), oder legst du eins an?
-4. **Python:** Ist Python installiert, oder soll die Anleitung das mit abdecken?
-5. **Handelszeiten:** Sollen Strategien vorerst auf New-York-Eröffnung (ab 15:30) optimiert werden?
+1. **GitHub-Zugriff für Claude freischalten** (sonst kann der Stand nicht gespeichert werden): GitHub unter https://claude.ai/connect-github verbinden und die Claude-GitHub-App für `leiter-idioten/Leiterbonus` installieren.
+2. **Demokonto in der MT5-App** anlegen (kostenlos, meist unter „Konten“ → „+“ → Broker wählen → Demokonto), möglichst beim selben Broker.
+3. **Broker-Daten nachschauen** (später reicht auch ein Screenshot):
+   - Konten-Übersicht: Broker-Name, Server, Hebel (z. B. „1:30“ / „1:500“)
+   - XAUUSD antippen → Eigenschaften/Spezifikation: Kontraktgröße, Mindest-Lot, Lot-Schritt
+   - Spread von XAUUSD zur Handelszeit (Differenz zwischen Kauf- und Verkaufskurs)
+
+## 13. Freigabe
+
+Wenn du mit diesem Plan einverstanden bist, schreib einfach **„Plan freigegeben“** – dann starte ich mit Meilenstein 1.
+Änderungswünsche gern vorher.
