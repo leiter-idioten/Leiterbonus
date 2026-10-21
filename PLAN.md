@@ -1,6 +1,6 @@
 # Leiterbonus – Plan: Gold-Scalping-Assistent (XAU/USD) fürs Handy
 
-> Status: **Finaler Plan – wartet auf Freigabe.** Erst nach Freigabe wird programmiert.
+> Status: **Freigegeben.** M1 und M2 erledigt – Seite: https://claude.ai/artifact/3LvR3KzfWpQH1EQYGaHsej
 
 ## 1. Ziel
 
@@ -53,7 +53,7 @@ Das Ergebnis ist eine **private Seite (Claude-Artifact)**, die du auf dem Handy 
 
 **Ehrliche Einschränkung:** Die Seite sieht den Live-Kurs nicht automatisch (das wäre nur mit kostenpflichtigen Datenfeeds oder einem PC mit MT5 zuverlässig).
 Darum liefert sie **Setups mit klaren Bedingungen** („Wenn eine 1-Minuten-Kerze über 2.xxx schließt → Long“), die du im MT5-Chart erkennst.
-In Meilenstein 1 testen wir, ob ein kostenloser Live-Kurs in der Seite funktioniert – falls ja, kommt er als Extra dazu.
+Ergebnis aus Meilenstein 1: Die Seite darf aus Sicherheitsgründen keine fremden Server abfragen, ein Live-Kurs in der Seite ist also nicht möglich. Der Live-Kurs kommt aus der MT5-App.
 
 ## 4. Die Seite (Aufbau)
 
@@ -150,8 +150,8 @@ Leiterbonus/
 
 | # | Inhalt | Ergebnis |
 |---|---|---|
-| M1 | Seite-Grundgerüst (Handy-Layout), Risiko-Rechner, Checkliste; Test, ob ein kostenloser Live-Kurs möglich ist | erste nutzbare Seite |
-| M2 | Tagebuch + Statistik mit Datenbank | Trades eintragen und auswerten |
+| M1 ✅ | Seite-Grundgerüst (Handy-Layout), Risiko-Rechner, Checkliste; Test, ob ein kostenloser Live-Kurs möglich ist (nein) | erste nutzbare Seite |
+| M2 ✅ | Tagebuch + Statistik mit Datenbank | Trades eintragen und auswerten |
 | M3 | Historische Daten laden + Backtest-Engine + 2–3 Strategien | Trefferquoten je Strategie |
 | M4 | Tagesbriefing: Nachrichten, Kalender, Sperrzeiten, Kursmarken, Setups | erstes vollständiges „Update fürs Trading heute“ |
 | M5 | Lern-Schleife: Tagebuch auswerten, Parameter anpassen | Update berücksichtigt deine Ergebnisse |
