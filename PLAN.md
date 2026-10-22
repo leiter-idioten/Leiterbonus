@@ -152,7 +152,7 @@ Leiterbonus/
 |---|---|---|
 | M1 ✅ | Seite-Grundgerüst (Handy-Layout), Risiko-Rechner, Checkliste; Test, ob ein kostenloser Live-Kurs möglich ist (nein) | erste nutzbare Seite |
 | M2 ✅ | Tagebuch + Statistik mit Datenbank | Trades eintragen und auswerten |
-| M3 | Historische Daten laden + Backtest-Engine + 2–3 Strategien | Trefferquoten je Strategie |
+| M3 🟡 | Historische Daten laden + Backtest-Engine + 2–3 Strategien | Engine, Datenlader, 3 Strategien und Tests fertig; echte Läufe warten auf Netzwerk-Freigabe für `datafeed.dukascopy.com` |
 | M4 | Tagesbriefing: Nachrichten, Kalender, Sperrzeiten, Kursmarken, Setups | erstes vollständiges „Update fürs Trading heute“ |
 | M5 | Lern-Schleife: Tagebuch auswerten, Parameter anpassen | Update berücksichtigt deine Ergebnisse |
 | M6 | **Demo-Phase**: mind. 4 Wochen bzw. 50–100 Trades auf dem Demokonto | Entscheidung: Echtgeld ja/nein |
