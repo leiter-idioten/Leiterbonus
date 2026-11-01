@@ -41,6 +41,17 @@ Dann im Browser `http://localhost:5173` öffnen. Zum Testen auf dem Handy (im se
 
 Produktions-Build: `npm run build` (Ausgabe in `dist/`).
 
+## Einzelne HTML-Datei (offline, z. B. als Artefakt)
+
+```bash
+npx vite build --mode artifact
+python3 scripts/build-artifact.py partymap.html
+```
+
+Diese Variante nutzt eine eingebaute Deutschlandkarte (Bundesländer, Nachbarländer, Städte) statt Online-Kartenkacheln
+und braucht keine Internetverbindung. Kartengrundlage: [deutschlandGeoJSON](https://github.com/isellsoap/deutschlandGeoJSON),
+[world-atlas](https://github.com/topojson/world-atlas) (Natural Earth).
+
 ## Online stellen (GitHub Pages)
 
 Der Workflow `.github/workflows/pages.yml` baut und veröffentlicht die App bei jedem Push auf `main`.

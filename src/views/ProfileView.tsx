@@ -1,3 +1,4 @@
+import { ConfirmButton } from '../components/ConfirmButton';
 import { currentUser, logout, resetAll, type DB } from '../store';
 import { toast } from '../toast';
 import { ageFrom, CREATE_FEE, euroExact, initials } from '../utils';
@@ -59,17 +60,16 @@ export function ProfileView({ db }: { db: DB }) {
           >
             Abmelden
           </button>
-          <button
+          <ConfirmButton
             className="btn btn--block btn--danger"
-            onClick={() => {
-              if (confirm('Alle lokalen Daten (Konten, Partys, Tickets) löschen und Demo-Daten neu laden?')) {
-                resetAll();
-                toast('Demo-Daten zurückgesetzt');
-              }
+            confirmLabel="Alles löschen? Nochmal tippen"
+            onConfirm={() => {
+              resetAll();
+              toast('Demo-Daten zurückgesetzt');
             }}
           >
             Demo-Daten zurücksetzen
-          </button>
+          </ConfirmButton>
         </div>
         <p className="muted tiny center">PartyMap Prototyp v0.1 · Daten nur lokal in diesem Browser</p>
       </div>

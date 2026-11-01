@@ -1,13 +1,11 @@
 import L from 'leaflet';
 import { Fragment, useEffect, useMemo } from 'react';
-import { Circle, MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
+import { Circle, MapContainer, Marker, useMap } from 'react-leaflet';
+import { BaseLayer, OFFLINE_MAP } from './BaseLayer';
 import type { Booking, Party, User } from '../types';
 import { canSeeAddress, euro, fuzzyLocation, isFull, isLive } from '../utils';
 
 export const GERMANY_CENTER: [number, number] = [51.1657, 10.4515];
-export const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-export const TILE_ATTR =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
 interface Props {
   parties: Party[];
@@ -61,6 +59,7 @@ export function MapView({ parties, bookings, user, selectedId, onSelect, focus }
       center={GERMANY_CENTER}
       zoom={6}
       minZoom={5}
+      maxZoom={OFFLINE_MAP ? 14 : 19}
       maxBounds={[
         [44, -2],
         [58, 23],
@@ -68,7 +67,7 @@ export function MapView({ parties, bookings, user, selectedId, onSelect, focus }
       zoomControl={false}
       attributionControl
     >
-      <TileLayer url={TILE_URL} attribution={TILE_ATTR} subdomains="abcd" maxZoom={19} />
+      <BaseLayer />
       <FocusController focus={focus} />
       {items.map(({ p, exact, pos, going, mine, full }) => (
         <Fragment key={p.id}>

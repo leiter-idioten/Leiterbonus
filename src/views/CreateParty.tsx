@@ -1,8 +1,10 @@
 import L from 'leaflet';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
-import { GERMANY_CENTER, TILE_ATTR, TILE_URL } from '../components/MapView';
+import { MapContainer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import { BaseLayer, OFFLINE_MAP } from '../components/BaseLayer';
+import { GERMANY_CENTER } from '../components/MapView';
+import { nearestCity } from '../data/cities';
 import { PAYMENT_METHODS } from '../components/Checkout';
 import { createParty } from '../store';
 import type { Drink, Party } from '../types';
@@ -114,6 +116,10 @@ export function CreateParty({ onCreated }: { onCreated: (p: Party) => void }) {
 
   const pickOnMap = async (lat: number, lng: number) => {
     setPos([lat, lng]);
+    if (OFFLINE_MAP) {
+      if (!city) setCity(nearestCity(lat, lng));
+      return;
+    }
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&accept-language=de&lat=${lat}&lon=${lng}`,
@@ -213,7 +219,7 @@ export function CreateParty({ onCreated }: { onCreated: (p: Party) => void }) {
               placeholder="Was ist das Motto? Was sollen Gäste mitbringen?"
             />
           </label>
-          <div className="grid2">
+          <div className="grid2 grid2--dates">
             <label>
               <span>Start</span>
               <input type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} />
@@ -227,6 +233,9 @@ export function CreateParty({ onCreated }: { onCreated: (p: Party) => void }) {
 
         <h2 className="section-title">Ort</h2>
         <div className="card form">
+          {OFFLINE_MAP ? (
+            <p className="muted small">Zoom auf der Karte zu deinem Ort und tippe auf die Stelle der Party. Adresse und Stadt trägst du darunter ein.</p>
+          ) : (
           <div className="search-row">
             <input
               value={query}
@@ -238,6 +247,7 @@ export function CreateParty({ onCreated }: { onCreated: (p: Party) => void }) {
               {searching ? <span className="spinner" /> : 'Suchen'}
             </button>
           </div>
+          )}
           {results.length > 0 && (
             <ul className="geo-results">
               {results.map((r) => (
@@ -250,8 +260,8 @@ export function CreateParty({ onCreated }: { onCreated: (p: Party) => void }) {
             </ul>
           )}
           <div className="pick-map">
-            <MapContainer center={GERMANY_CENTER} zoom={5} zoomControl={false} attributionControl={false}>
-              <TileLayer url={TILE_URL} attribution={TILE_ATTR} subdomains="abcd" />
+            <MapContainer center={GERMANY_CENTER} zoom={5} maxZoom={OFFLINE_MAP ? 14 : 19} zoomControl={false} attributionControl={false}>
+              <BaseLayer />
               <PickHandler onPick={pickOnMap} />
               <Recenter pos={flyTo} />
               {pos && <Marker position={pos} icon={pickIcon} />}

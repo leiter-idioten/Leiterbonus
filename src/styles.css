@@ -963,8 +963,16 @@ input[type='date'] {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+.grid2 > * {
+  min-width: 0;
+}
 @media (max-width: 380px) {
   .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .grid2--dates {
     grid-template-columns: 1fr;
   }
 }
@@ -1423,4 +1431,38 @@ input[type='date'] {
     transform: translate(-50%, -16px);
     opacity: 0;
   }
+}
+
+.btn--armed {
+  background: var(--red) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+/* ---------- Eingebaute Offline-Karte (Artefakt) ---------- */
+
+.map--offline {
+  background: #0d1220 !important;
+}
+.city-label-wrap {
+  background: none;
+  border: none;
+}
+.city-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8a86a8;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px #0b0b14, 0 0 6px #0b0b14;
+  pointer-events: none;
+}
+.city-label--big {
+  font-size: 13px;
+  font-weight: 750;
+  color: #b9b4d6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }

@@ -1,3 +1,4 @@
+import { ConfirmButton } from '../components/ConfirmButton';
 import { useState } from 'react';
 import { cancelParty, currentUser, markPaidAtDoor, respondToBooking, type DB } from '../store';
 import { toast } from '../toast';
@@ -179,17 +180,16 @@ function HostPartyCard({ p, db, onShowOnMap }: { p: Party; db: DB; onShowOnMap: 
               </button>
             )}
             {!p.cancelled && !over && (
-              <button
+              <ConfirmButton
                 className="btn btn--danger"
-                onClick={() => {
-                  if (confirm('Party wirklich absagen? Alle Gäste werden storniert und bekommen ihr Geld zurück.')) {
-                    cancelParty(p.id);
-                    toast('Party abgesagt');
-                  }
+                confirmLabel="Wirklich absagen?"
+                onConfirm={() => {
+                  cancelParty(p.id);
+                  toast('Party abgesagt, alle Gäste werden erstattet');
                 }}
               >
                 Absagen
-              </button>
+              </ConfirmButton>
             )}
           </div>
         </div>

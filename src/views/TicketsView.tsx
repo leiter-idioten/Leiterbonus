@@ -1,3 +1,4 @@
+import { ConfirmButton } from '../components/ConfirmButton';
 import { TicketCode } from '../components/TicketCode';
 import { cancelBooking, currentUser, type DB } from '../store';
 import { toast } from '../toast';
@@ -114,17 +115,16 @@ export function TicketsView({ db, onExplore, onShowOnMap }: { db: DB; onExplore:
                   </button>
                 )}
                 {(b.status === 'pending' || b.status === 'accepted') && !isOver(p) && (
-                  <button
+                  <ConfirmButton
                     className="btn btn--sm btn--danger"
-                    onClick={() => {
-                      if (confirm('Anmeldung wirklich stornieren?')) {
-                        cancelBooking(b.id);
-                        toast('Anmeldung storniert');
-                      }
+                    confirmLabel="Wirklich stornieren?"
+                    onConfirm={() => {
+                      cancelBooking(b.id);
+                      toast('Anmeldung storniert');
                     }}
                   >
                     Stornieren
-                  </button>
+                  </ConfirmButton>
                 )}
               </div>
             </article>
